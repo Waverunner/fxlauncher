@@ -125,7 +125,7 @@ public abstract class AbstractLauncher<APP>  {
             Path target = cacheDir.resolve(lib.file).toAbsolutePath();
             Files.createDirectories(target.getParent());
 
-            URI uri = manifest.uri.resolve(lib.file);
+            URI uri = manifest.getLibraryURI().resolve(lib.file);
 
             try (InputStream input = openDownloadStream(uri); OutputStream output = Files.newOutputStream(target)) {
 

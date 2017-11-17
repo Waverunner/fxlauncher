@@ -33,6 +33,8 @@ public class FXManifest {
 	@XmlElement(name = "lib")
 	public List<LibraryFile> files = new ArrayList<>();
 	@XmlElement
+	public AbstractResolver resolver;
+	@XmlElement
 	public String updateText = "Updating...";
 	@XmlElement
 	public String updateLabelStyle = "-fx-font-weight: bold;";
@@ -65,10 +67,21 @@ public class FXManifest {
 	}
 
 	public URI getFXAppURI() {
-		if (uri.getPath().endsWith("/"))
-			return uri.resolve("app.xml");
-
+		if (resolver != null) {
+			uri = resolver.getManifestURI();
+			return resolver.getManifestURI() != null ? resolver.getManifestURI() : uri;
+		} else {
+			if (uri.getPath().endsWith("/"))
+				return uri.resolve("app.xml");
+		}
 		return URI.create(uri.toString() + "/app.xml");
+	}
+
+	public URI getLibraryURI() {
+		if (resolver != null) {
+			return resolver.getLibraryURI();
+		}
+		return uri;
 	}
 
 	public Path getPath(Path cacheDir) {
@@ -136,6 +149,7 @@ public class FXManifest {
 
 		if (ts != null ? !ts.equals(that.ts) : that.ts != null) return false;
 		if (uri != null ? !uri.equals(that.uri) : that.uri != null) return false;
+		if (resolver != null ? !resolver.equals(that.resolver) : that.resolver != null) return false;
 		if (launchClass != null ? !launchClass.equals(that.launchClass) : that.launchClass != null) return false;
 		if (files != null ? !files.equals(that.files) : that.files != null) return false;
 		if (updateText != null ? !updateText.equals(that.updateText) : that.updateText != null) return false;
@@ -154,6 +168,7 @@ public class FXManifest {
 	public int hashCode() {
 		int result = ts != null ? ts.hashCode() : 0;
 		result = 31 * result + (uri != null ? uri.hashCode() : 0);
+		result = 31 * result + (resolver != null ? resolver.hashCode() : 0);
 		result = 31 * result + (launchClass != null ? launchClass.hashCode() : 0);
 		result = 31 * result + (files != null ? files.hashCode() : 0);
 		result = 31 * result + (updateText != null ? updateText.hashCode() : 0);
